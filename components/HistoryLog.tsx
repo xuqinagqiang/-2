@@ -94,9 +94,10 @@ const SettingsModal: React.FC<{ onClose: () => void, onSave: () => void }> = ({ 
     const [days, setDays] = useState(getAppSettings().photoRetentionDays);
     const [cleanedCount, setCleanedCount] = useState<number | null>(null);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         saveAppSettings({ photoRetentionDays: days });
-        const count = cleanupOldPhotos();
+        // Fix: Await cleanupOldPhotos
+        const count = await cleanupOldPhotos();
         if (count > 0) {
             setCleanedCount(count);
             // Delay closing to show success msg
@@ -267,15 +268,17 @@ const HistoryLog: React.FC<HistoryLogProps> = ({ records, equipment, onUpdate })
     document.body.removeChild(link);
   };
 
-  const handleSaveEdit = (updatedRecord: LubeRecord) => {
-    updateRecord(updatedRecord);
+  const handleSaveEdit = async (updatedRecord: LubeRecord) => {
+    // Fix: Await updateRecord
+    await updateRecord(updatedRecord);
     setEditingRecord(null);
     onUpdate(); 
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm(t.history.deleteConfirm)) {
-        deleteRecord(id);
+        // Fix: Await deleteRecord
+        await deleteRecord(id);
         onUpdate();
     }
   };

@@ -36,7 +36,8 @@ const StockModal: React.FC<StockModalProps> = ({ item, type, onClose, onConfirm 
             <div className="p-6 space-y-4">
                 <p className="font-medium text-slate-700">{item.name} <span className="text-slate-400 font-normal">({item.type})</span></p>
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">{t.stock.amount} ({item.unit})</label>
+                    {/* Fixed: Use t.common.amount instead of t.stock.amount */}
+                    <label className="block text-sm font-medium text-slate-700 mb-1">{t.common.amount} ({item.unit})</label>
                     <input type="number" step="0.1" autoFocus
                         className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
                         placeholder="0.0" value={amount} onChange={e => setAmount(e.target.value)} />
@@ -57,7 +58,8 @@ const StockModal: React.FC<StockModalProps> = ({ item, type, onClose, onConfirm 
                         disabled={!amount || !user}
                         className={`flex-1 py-2 text-white rounded flex items-center justify-center gap-2 ${type === 'IN' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                     >
-                        {type === 'IN' ? t.stock.confirmIn : t.stock.confirmOut}
+                        {/* Fixed: Use t.stock.confirm instead of t.stock.confirmIn/confirmOut */}
+                        {t.stock.confirm}
                     </button>
                 </div>
             </div>
@@ -183,7 +185,7 @@ const Dashboard: React.FC<DashboardProps> = ({ equipment, records, inventory, tr
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
             {inventory.map(item => (
-                <div key={item.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 relative overflow-hidden group">
+                <div key={item.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 relative overflow-hidden group">
                     <div className="flex justify-between items-start mb-2">
                         <div>
                             <h4 className="font-bold text-slate-700">{item.name}</h4>

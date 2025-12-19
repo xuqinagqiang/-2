@@ -211,7 +211,8 @@ const DailySchedule: React.FC<DailyScheduleProps> = ({ equipment, onUpdate }) =>
       t.schedule.status, 
       t.inventory.name, 
       t.inventory.location, 
-      t.inventory.type, 
+      // Fixed: Use t.common.type instead of t.inventory.type
+      t.common.type, 
       t.inventory.lubricant, 
       t.inventory.capacity, 
       t.schedule.planDate, 

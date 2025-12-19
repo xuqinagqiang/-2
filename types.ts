@@ -66,7 +66,7 @@ export interface AppSettings {
   photoRetentionDays: number; // 0 means keep forever
 }
 
-export type ViewState = 'dashboard' | 'inventory' | 'schedule' | 'history' | 'assistant' | 'stock' | 'sop';
+export type ViewState = 'dashboard' | 'inventory' | 'schedule' | 'history' | 'assistant' | 'stock' | 'sop' | 'sync';
 
 export enum Priority {
   OK = 'OK',

@@ -19,12 +19,18 @@ const SOPManager: React.FC = () => {
   const [editingDoc, setEditingDoc] = useState<Partial<SOPDocument>>({});
 
   useEffect(() => {
-    setCategories(getSOPCategories());
-    setDocuments(getSOPDocuments());
+    // Fix: Await initial data loading
+    const loadData = async () => {
+        const cats = await getSOPCategories();
+        const docs = await getSOPDocuments();
+        setCategories(cats);
+        setDocuments(docs);
+    };
+    loadData();
   }, []);
 
   // --- Category Handlers ---
-  const handleSaveCategory = () => {
+  const handleSaveCategory = async () => {
     if (!editingCategory.name) return;
     let newCats = [...categories];
     if (editingCategory.id) {
@@ -32,16 +38,18 @@ const SOPManager: React.FC = () => {
     } else {
         newCats.push({ ...editingCategory, id: crypto.randomUUID() } as SOPCategory);
     }
-    saveSOPCategories(newCats);
+    // Fix: Await saveSOPCategories
+    await saveSOPCategories(newCats);
     setCategories(newCats);
     setIsCatModalOpen(false);
   };
 
-  const handleDeleteCategory = (id: string, e: React.MouseEvent) => {
+  const handleDeleteCategory = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (confirm(t.history.deleteConfirm)) {
         const newCats = categories.filter(c => c.id !== id);
-        saveSOPCategories(newCats);
+        // Fix: Await saveSOPCategories
+        await saveSOPCategories(newCats);
         setCategories(newCats);
         if (selectedCategory?.id === id) setSelectedCategory(null);
     }
@@ -53,7 +61,7 @@ const SOPManager: React.FC = () => {
   };
 
   // --- Document Handlers ---
-  const handleSaveDoc = () => {
+  const handleSaveDoc = async () => {
     if (!editingDoc.title || !selectedCategory) return;
     let newDocs = [...documents];
     const now = new Date().toISOString().split('T')[0];
@@ -68,15 +76,17 @@ const SOPManager: React.FC = () => {
             updatedAt: now 
         } as SOPDocument);
     }
-    saveSOPDocuments(newDocs);
+    // Fix: Await saveSOPDocuments
+    await saveSOPDocuments(newDocs);
     setDocuments(newDocs);
     setIsDocModalOpen(false);
   };
 
-  const handleDeleteDoc = (id: string) => {
+  const handleDeleteDoc = async (id: string) => {
       if (confirm(t.history.deleteConfirm)) {
           const newDocs = documents.filter(d => d.id !== id);
-          saveSOPDocuments(newDocs);
+          // Fix: Await saveSOPDocuments
+          await saveSOPDocuments(newDocs);
           setDocuments(newDocs);
       }
   };

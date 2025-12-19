@@ -68,7 +68,8 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, onClose, onSave }) => {
                 value={formData.stock} onChange={e => setFormData({...formData, stock: parseFloat(e.target.value)})} />
             </div>
              <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">{t.stock.unit}</label>
+              {/* Fixed: Use t.common.unit instead of t.stock.unit */}
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t.common.unit}</label>
               <input required type="text" className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
                 value={formData.unit} onChange={e => setFormData({...formData, unit: e.target.value})} placeholder="kg, L" />
             </div>
@@ -111,7 +112,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ item, type, onClose
             <div className="p-6 space-y-4">
                 <p className="font-medium text-slate-700">{item.name}</p>
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">{t.stock.amount} ({item.unit})</label>
+                    {/* Fixed: Use t.common.amount instead of t.stock.amount */}
+                    <label className="block text-sm font-medium text-slate-700 mb-1">{t.common.amount} ({item.unit})</label>
                     <input type="number" step="0.1" autoFocus
                         className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
                         placeholder="0.0" value={amount} onChange={e => setAmount(e.target.value)} />
@@ -174,7 +176,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({ transaction
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">{t.stock.amount}</label>
+                    {/* Fixed: Use t.common.amount instead of t.stock.amount */}
+                    <label className="block text-sm font-medium text-slate-700 mb-1">{t.common.amount}</label>
                     <input type="number" step="0.1" 
                         className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
                         value={formData.amount} onChange={e => setFormData({...formData, amount: parseFloat(e.target.value)})} />
@@ -225,33 +228,37 @@ const LubeStockManager: React.FC<LubeStockManagerProps> = ({ inventory, transact
     ).sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [transactions, searchTerm]);
 
-  const handleSaveItem = (item: LubeInventory) => {
+  const handleSaveItem = async (item: LubeInventory) => {
     let newInventory = [...inventory];
     if (item.id) {
         newInventory = newInventory.map(i => i.id === item.id ? item : i);
     } else {
         newInventory.push({ ...item, id: crypto.randomUUID() });
     }
-    saveInventory(newInventory);
+    // Fix: Await saveInventory
+    await saveInventory(newInventory);
     onUpdate();
     setActiveItemModal(null);
   };
 
-  const handleDeleteItem = (id: string) => {
+  const handleDeleteItem = async (id: string) => {
     if (confirm(t.history.deleteConfirm)) {
         const newInventory = inventory.filter(i => i.id !== id);
-        saveInventory(newInventory);
+        // Fix: Await saveInventory
+        await saveInventory(newInventory);
         onUpdate();
     }
   };
 
-  const handleTransaction = (amount: number, user: string) => {
+  const handleTransaction = async (amount: number, user: string) => {
     if (!activeTransModal) return;
     const { item, type } = activeTransModal;
     const delta = type === 'IN' ? amount : -amount;
     
-    updateInventoryStock(item.id, delta);
-    addTransaction({
+    // Fix: Await updateInventoryStock
+    await updateInventoryStock(item.id, delta);
+    // Fix: Await addTransaction
+    await addTransaction({
         id: crypto.randomUUID(),
         inventoryId: item.id,
         inventoryName: item.name,
@@ -265,15 +272,17 @@ const LubeStockManager: React.FC<LubeStockManagerProps> = ({ inventory, transact
     setActiveTransModal(null);
   };
 
-  const handleUpdateTransaction = (tx: StockTransaction) => {
-    updateTransaction(tx);
+  const handleUpdateTransaction = async (tx: StockTransaction) => {
+    // Fix: Await updateTransaction
+    await updateTransaction(tx);
     onUpdate();
     setEditingTx(null);
   };
 
-  const handleDeleteTransaction = (id: string) => {
+  const handleDeleteTransaction = async (id: string) => {
     if (confirm(t.history.deleteConfirm)) {
-      deleteTransaction(id);
+      // Fix: Await deleteTransaction
+      await deleteTransaction(id);
       onUpdate();
     }
   };
@@ -283,7 +292,8 @@ const LubeStockManager: React.FC<LubeStockManagerProps> = ({ inventory, transact
         alert("No records.");
         return;
     }
-    const headers = [t.common.date, t.stock.itemName, t.common.type, t.stock.amount, t.common.user];
+    // Fixed: Use t.common.amount instead of t.stock.amount
+    const headers = [t.common.date, t.stock.itemName, t.common.type, t.common.amount, t.common.user];
     const csvContent = [
       headers.join(","),
       ...filteredTransactions.map(t => 
@@ -403,7 +413,8 @@ const LubeStockManager: React.FC<LubeStockManagerProps> = ({ inventory, transact
                                 <th className="p-4 font-semibold text-slate-600 text-sm">{t.common.date}</th>
                                 <th className="p-4 font-semibold text-slate-600 text-sm">{t.common.type}</th>
                                 <th className="p-4 font-semibold text-slate-600 text-sm">{t.stock.itemName}</th>
-                                <th className="p-4 font-semibold text-slate-600 text-sm">{t.stock.amount}</th>
+                                {/* Fixed: Use t.common.amount instead of t.stock.amount */}
+                                <th className="p-4 font-semibold text-slate-600 text-sm">{t.common.amount}</th>
                                 <th className="p-4 font-semibold text-slate-600 text-sm">{t.common.user}</th>
                                 <th className="p-4 font-semibold text-slate-600 text-sm text-right">{t.common.actions}</th>
                             </tr>

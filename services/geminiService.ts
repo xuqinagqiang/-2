@@ -2,15 +2,12 @@
 import { GoogleGenAI } from "@google/genai";
 import { Equipment } from "../types";
 
-const apiKey = process.env.API_KEY || '';
-
-// We use gemini-2.5-flash for fast, responsive text advice
-const MODEL_NAME = 'gemini-2.5-flash';
+// Fix: Use gemini-3-flash-preview for basic text tasks
+const MODEL_NAME = 'gemini-3-flash-preview';
 
 export const getMaintenanceAdvice = async (query: string, equipmentContext?: Equipment[], language: string = 'zh') => {
-  if (!apiKey) throw new Error("API Key missing");
-
-  const ai = new GoogleGenAI({ apiKey });
+  // Fix: Initialize ai client directly with process.env.API_KEY
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   let contextStr = "";
   if (equipmentContext && equipmentContext.length > 0) {
@@ -36,9 +33,8 @@ export const getMaintenanceAdvice = async (query: string, equipmentContext?: Equ
 };
 
 export const analyzeSchedule = async (equipment: Equipment[], language: string = 'zh') => {
-  if (!apiKey) return "API Key missing";
-
-  const ai = new GoogleGenAI({ apiKey });
+  // Fix: Initialize ai client directly with process.env.API_KEY
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const overdue = equipment.filter(e => {
     const today = new Date().toISOString().split('T')[0];
