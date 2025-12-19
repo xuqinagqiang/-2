@@ -70,7 +70,10 @@ const AppContent: React.FC = () => {
         .subscribe();
 
       return () => {
-        supabase.removeChannel(channel);
+        // Fix TS18047: Add null check for supabase
+        if (supabase) {
+          supabase.removeChannel(channel);
+        }
       };
     }
   }, [refreshData]);

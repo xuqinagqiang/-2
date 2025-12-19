@@ -5,7 +5,7 @@ import { Equipment } from "../types";
 // Fix: Use gemini-3-flash-preview for basic text tasks
 const MODEL_NAME = 'gemini-3-flash-preview';
 
-export const getMaintenanceAdvice = async (query: string, equipmentContext?: Equipment[], language: string = 'zh') => {
+export const getMaintenanceAdvice = async (query: string, equipmentContext?: Equipment[], language: string = 'zh'): Promise<string> => {
   // Fix: Initialize ai client directly with process.env.API_KEY
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
@@ -29,10 +29,10 @@ export const getMaintenanceAdvice = async (query: string, equipmentContext?: Equ
     }
   });
 
-  return response.text;
+  return response.text || "";
 };
 
-export const analyzeSchedule = async (equipment: Equipment[], language: string = 'zh') => {
+export const analyzeSchedule = async (equipment: Equipment[], language: string = 'zh'): Promise<string> => {
   // Fix: Initialize ai client directly with process.env.API_KEY
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -64,5 +64,5 @@ export const analyzeSchedule = async (equipment: Equipment[], language: string =
     contents: prompt,
   });
 
-  return response.text;
+  return response.text || "";
 }
