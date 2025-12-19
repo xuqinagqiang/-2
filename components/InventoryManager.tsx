@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Equipment } from '../types';
 import { saveEquipment, calculateNextDate } from '../services/storageService';
-import { Plus, Search, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface InventoryManagerProps {
@@ -14,11 +14,12 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({ equipment, onUpdate
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { t } = useLanguage();
 
   const initialFormState: Omit<Equipment, 'id' | 'nextLubricated'> = {
     name: '',
-    type: 'Motor',
+    type: '电机',
     location: '',
     lubricant: '',
     cycleDays: 30,
@@ -35,8 +36,9 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({ equipment, onUpdate
     e.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     const nextLubricated = calculateNextDate(formData.lastLubricated, formData.cycleDays);
 
@@ -44,7 +46,7 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({ equipment, onUpdate
     if (editingId) {
       updatedList = equipment.map(item => 
         item.id === editingId 
-          ? { ...formData, id: editingId, nextLubricated } 
+          ? { ...formData, id: editingId, nextLubricated } as Equipment
           : item
       );
     } else {
@@ -56,9 +58,14 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({ equipment, onUpdate
       updatedList = [...equipment, newItem];
     }
 
-    saveEquipment(updatedList);
-    onUpdate();
-    handleCloseModal();
+    try {
+      await saveEquipment(updatedList);
+      onUpdate();
+      handleCloseModal();
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "保存失败，请检查数据库连接及表结构。");
+    }
   };
 
   const handleEdit = (item: Equipment) => {
@@ -76,17 +83,22 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({ equipment, onUpdate
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm(t.history.deleteConfirm)) {
-      const updatedList = equipment.filter(item => item.id !== id);
-      saveEquipment(updatedList);
-      onUpdate();
+      try {
+        const updatedList = equipment.filter(item => item.id !== id);
+        await saveEquipment(updatedList);
+        onUpdate();
+      } catch (err: any) {
+        alert("删除失败: " + err.message);
+      }
     }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
+    setError(null);
     setFormData(initialFormState);
   };
 
@@ -106,7 +118,6 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({ equipment, onUpdate
         </button>
       </div>
 
-      {/* Search Bar */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
         <input 
@@ -118,7 +129,6 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({ equipment, onUpdate
         />
       </div>
 
-      {/* List */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -160,7 +170,6 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({ equipment, onUpdate
         </div>
       </div>
 
-      {/* Modal Form */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
@@ -170,7 +179,15 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({ equipment, onUpdate
                 <X size={24} />
               </button>
             </div>
+            
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg flex items-center gap-2 text-sm">
+                   <AlertCircle size={16} />
+                   {error}
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">{t.inventory.name}</label>
                 <input required type="text" className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" 

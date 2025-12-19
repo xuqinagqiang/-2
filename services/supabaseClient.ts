@@ -9,18 +9,23 @@ export interface SupabaseConfig {
 }
 
 export const getSupabaseConfig = (): SupabaseConfig | null => {
-  // Priority 1: Environment Variables (Production/Vercel)
-  // Note: Vercel environment variables are available via process.env
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    return { 
-      url: process.env.SUPABASE_URL, 
-      key: process.env.SUPABASE_ANON_KEY 
-    };
+  // Priority 1: Environment Variables
+  const envUrl = process.env.SUPABASE_URL;
+  const envKey = process.env.SUPABASE_ANON_KEY;
+  
+  if (envUrl && envKey && envUrl !== "undefined" && envKey !== "undefined") {
+    return { url: envUrl, key: envKey };
   }
 
-  // Priority 2: Local Storage (Manual user config)
+  // Priority 2: Local Storage
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      return null;
+    }
+  }
   
   return null;
 };
