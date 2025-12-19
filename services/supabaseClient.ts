@@ -1,6 +1,13 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// ==========================================
+// 填写您的 Supabase 信息在这里即可固定
+// ==========================================
+const HARDCODED_URL = ''; // 例如: 'https://xyz.supabase.co'
+const HARDCODED_KEY = ''; // 例如: 'eyJhbGciOiJIUzI1Ni...'
+// ==========================================
+
 const STORAGE_KEY = 'lubetrack_supabase_config';
 
 export interface SupabaseConfig {
@@ -9,7 +16,12 @@ export interface SupabaseConfig {
 }
 
 export const getSupabaseConfig = (): SupabaseConfig | null => {
-  // Priority 1: Environment Variables
+  // 优先级 1: 代码中硬编码的值 (如果有填写)
+  if (HARDCODED_URL && HARDCODED_KEY) {
+    return { url: HARDCODED_URL, key: HARDCODED_KEY };
+  }
+
+  // 优先级 2: 环境变量 (Vercel 设置)
   const envUrl = process.env.SUPABASE_URL;
   const envKey = process.env.SUPABASE_ANON_KEY;
   
@@ -17,7 +29,7 @@ export const getSupabaseConfig = (): SupabaseConfig | null => {
     return { url: envUrl, key: envKey };
   }
 
-  // Priority 2: Local Storage
+  // 优先级 3: 浏览器本地存储 (Sync Center 手动输入)
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
     try {
@@ -39,7 +51,12 @@ export const initSupabase = () => {
   if (!config || !config.url || !config.key) return null;
   
   try {
-    return createClient(config.url, config.key);
+    return createClient(config.url, config.key, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true
+      }
+    });
   } catch (error) {
     console.error("Failed to initialize Supabase client:", error);
     return null;

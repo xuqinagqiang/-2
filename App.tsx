@@ -17,7 +17,6 @@ import LubeStockManager from './components/LubeStockManager';
 import SOPManager from './components/SOPManager';
 import SyncCenter from './components/SyncCenter';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
-// Fix: Add Globe to imports
 import { LayoutDashboard, Database, CalendarCheck, History, Menu, X, Sparkles, Droplet, Package, BookOpen, Cloud, CloudOff, RefreshCw, Globe } from 'lucide-react';
 
 const AppContent: React.FC = () => {
@@ -59,18 +58,14 @@ const AppContent: React.FC = () => {
     refreshData();
 
     if (supabase) {
-      // Set up Real-time subscriptions for cross-device sync
       const channel = supabase
         .channel('schema-db-changes')
         .on('postgres_changes', { event: '*', schema: 'public' }, () => {
-          // Instead of fetching everything, we could update local state, 
-          // but for a simple implementation, re-fetching ensures consistency.
           refreshData();
         })
         .subscribe();
 
       return () => {
-        // Fix TS18047: Add null check for supabase
         if (supabase) {
           supabase.removeChannel(channel);
         }
@@ -135,7 +130,6 @@ const AppContent: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 md:ml-64 min-h-screen relative">
-        {/* Header - Mobile */}
         <header className="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-2">
             <Droplet size={24} className="text-blue-600" />
@@ -157,14 +151,14 @@ const AppContent: React.FC = () => {
           )}
 
           {!supabase && view !== 'sync' && (
-             <div className="mb-6 bg-red-50 border border-red-100 p-4 rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-3 text-red-700">
+             <div className="mb-6 bg-amber-50 border border-amber-100 p-4 rounded-xl flex items-center justify-between">
+                <div className="flex items-center gap-3 text-amber-700">
                   <CloudOff size={20} />
-                  <p className="text-sm font-medium">数据库未连接。请前往“数据同步”配置 Supabase 以实现多端协同。</p>
+                  <p className="text-sm font-medium">数据库未连接。请在代码中填写配置或前往“数据同步”手动输入。</p>
                 </div>
                 <button 
                   onClick={() => setView('sync')}
-                  className="px-3 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700"
+                  className="px-3 py-1 bg-amber-600 text-white text-xs rounded-lg hover:bg-amber-700"
                 >
                   去配置
                 </button>
