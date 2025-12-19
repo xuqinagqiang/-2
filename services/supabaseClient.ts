@@ -4,8 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 // ==========================================
 // 填写您的 Supabase 信息在这里即可固定
 // ==========================================
-const HARDCODED_URL = ''; // 例如: 'https://xyz.supabase.co'
-const HARDCODED_KEY = ''; // 例如: 'eyJhbGciOiJIUzI1Ni...'
+const HARDCODED_URL = 'https://afzsusvfjickzvehylpr.supabase.co'; // 例如: 'https://xyz.supabase.co'
+const HARDCODED_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmenN1c3Zmamlja3p2ZWh5bHByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMTcxMzUsImV4cCI6MjA4MTY5MzEzNX0.jyDNODLUb4XGQ4oTx5O2nAKgc1grSF5AUVadQORt80o'; // 例如: 'eyJhbGciOiJIUzI1Ni...'
 // ==========================================
 
 const STORAGE_KEY = 'lubetrack_supabase_config';
